@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HR Leave Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -22,7 +23,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             width: 100%;
             background-color: white;
             border-radius: 20px;
@@ -46,7 +47,7 @@
         .header p {
             font-size: 1.2rem;
             opacity: 0.9;
-            max-width: 600px;
+            max-width: 700px;
             margin: 0 auto;
             line-height: 1.6;
         }
@@ -56,7 +57,7 @@
         }
 
         .system-description {
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             text-align: center;
         }
 
@@ -71,6 +72,40 @@
             line-height: 1.7;
             font-size: 1.1rem;
             margin-bottom: 15px;
+        }
+
+        .file-notice {
+            background-color: #e8f4fd;
+            border-left: 5px solid #2a5298;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .file-notice h3 {
+            color: #1e3c72;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-notice ul {
+            padding-left: 20px;
+            color: #555;
+            line-height: 1.7;
+            margin-top: 10px;
+        }
+
+        .file-notice li {
+            margin-bottom: 8px;
+        }
+
+        .file-notice code {
+            background-color: #f1f1f1;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
         }
 
         .features-list {
@@ -97,6 +132,9 @@
             color: #1e3c72;
             margin-bottom: 10px;
             font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .feature-card p {
@@ -144,10 +182,6 @@
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
 
-        .portal-btn i {
-            font-size: 1.5rem;
-        }
-
         .instructions {
             background-color: #f0f8ff;
             padding: 25px;
@@ -160,6 +194,9 @@
             color: #1e3c72;
             margin-bottom: 15px;
             font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .instructions ol {
@@ -219,7 +256,6 @@
             }
         }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
@@ -232,7 +268,17 @@
             <div class="system-description">
                 <h2>Welcome to the Leave Management Portal</h2>
                 <p>This system helps HR departments and employees track leaves, attendance, and related deductions in an organized and efficient manner.</p>
-                <p>Select your portal below to get started:</p>
+            </div>
+            
+            <div class="file-notice">
+                <h3><i class="fas fa-file-excel"></i> Excel File Integration</h3>
+                <p>The system reads employee data directly from an Excel file in the same folder.</p>
+                <ul>
+                    <li>Place your Excel file named <code>employee_data.xlsx</code> in this folder</li>
+                    <li>Or use the sample file: <code>sample_data.xlsx</code></li>
+                    <li>HR Portal can manage and upload new data</li>
+                    <li>Employee Portal automatically reads from the Excel file</li>
+                </ul>
             </div>
             
             <div class="portal-buttons">
@@ -248,72 +294,57 @@
             
             <div class="features-list">
                 <div class="feature-card">
-                    <h3><i class="fas fa-file-excel"></i> Excel Upload</h3>
-                    <p>HR can upload Excel files with employee leave and attendance data for easy processing.</p>
+                    <h3><i class="fas fa-file-upload"></i> Excel Upload</h3>
+                    <p>HR can upload and manage Excel files with employee leave and attendance data.</p>
                 </div>
                 
                 <div class="feature-card">
-                    <h3><i class="fas fa-calendar-alt"></i> Leave Tracking</h3>
-                    <p>Track total annual leaves, sick leaves, leaves taken, and remaining leaves for all employees.</p>
+                    <h3><i class="fas fa-calendar-check"></i> Leave Tracking</h3>
+                    <p>Track total annual leaves, sick leaves, leaves taken, and remaining leaves.</p>
                 </div>
                 
                 <div class="feature-card">
                     <h3><i class="fas fa-clock"></i> Late Attendance</h3>
-                    <p>Monitor late arrivals with date & time tracking and automatic deduction calculations.</p>
+                    <p>Monitor late arrivals with date & time tracking and automatic deductions.</p>
                 </div>
                 
                 <div class="feature-card">
-                    <h3><i class="fas fa-chart-pie"></i> Employee Dashboard</h3>
-                    <p>Employees can view their personal leave balances and attendance records in a user-friendly dashboard.</p>
+                    <h3><i class="fas fa-chart-bar"></i> Real-time Data</h3>
+                    <p>Employee portal reads directly from Excel file for up-to-date information.</p>
                 </div>
             </div>
             
             <div class="instructions">
                 <h3><i class="fas fa-info-circle"></i> How to Use the System</h3>
                 <ol>
-                    <li><strong>HR Personnel:</strong> Click on "HR Portal" to upload employee leave data via Excel files.</li>
-                    <li><strong>HR Personnel:</strong> Upload Excel files with employee IDs, leave balances, and late attendance records.</li>
-                    <li><strong>Employees:</strong> Click on "Employee Portal" to view your personal leave details and attendance records.</li>
-                    <li><strong>Employees:</strong> Check your remaining leaves, sick leaves, and any late attendance deductions.</li>
+                    <li><strong>Step 1:</strong> Ensure you have an Excel file with employee data in this folder</li>
+                    <li><strong>Step 2:</strong> HR personnel click "HR Portal" to upload/manage employee data</li>
+                    <li><strong>Step 3:</strong> Employees click "Employee Portal" to view their personal details</li>
+                    <li><strong>Step 4:</strong> The system automatically reads data from the Excel file</li>
+                    <li><strong>Step 5:</strong> Update the Excel file to see changes in the Employee Portal</li>
                 </ol>
             </div>
         </div>
         
         <div class="footer">
-            <p>HR Leave Management System &copy; 2023 | Secure | Efficient | User-Friendly</p>
+            <p>HR Leave Management System &copy; 2023 | Uses Excel File Integration</p>
         </div>
     </div>
 
     <script>
-        // Add a simple animation to the buttons on load
+        // Simple animation for buttons
         document.addEventListener('DOMContentLoaded', function() {
             const buttons = document.querySelectorAll('.portal-btn');
             buttons.forEach((button, index) => {
-                button.style.opacity = '0';
-                button.style.transform = 'translateY(20px)';
-                
                 setTimeout(() => {
-                    button.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                    button.style.opacity = '1';
                     button.style.transform = 'translateY(0)';
+                    button.style.opacity = '1';
                 }, 300 + (index * 200));
             });
             
-            // Add hover sound effect for buttons (optional)
-            buttons.forEach(button => {
-                button.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-7px) scale(1.02)';
-                });
-                
-                button.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0) scale(1)';
-                });
-            });
-            
-            // Show a welcome message
+            // Check if Excel file exists (simulated)
             console.log('HR Leave Management System Loaded');
-            console.log('Navigate to hr-portal.html for HR functionalities');
-            console.log('Navigate to employee-portal.html for employee view');
+            console.log('Note: The Employee Portal reads from employee_data.xlsx or sample_data.xlsx');
         });
     </script>
 </body>
