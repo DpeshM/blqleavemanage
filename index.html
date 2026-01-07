@@ -432,7 +432,7 @@
 
                 <div class="employee-selector">
                     <label for="employeeId">Select Your Employee ID</label>
-                    <select id="employeeId" onchange="loadEmployeeList()">
+                    <select id="employeeId">
                         <option value="">-- Select Employee ID --</option>
                     </select>
                     <button class="view-btn" onclick="viewEmployeeDetails()">View My Details</button>
@@ -507,7 +507,8 @@
                 hrPortal.classList.remove('active');
                 employeePortal.classList.add('active');
                 buttons[1].classList.add('active');
-                loadEmployeeList();
+                // Load employee list when switching to employee portal
+                setTimeout(() => loadEmployeeList(), 100);
             }
         }
 
@@ -649,9 +650,12 @@
 
         function loadEmployeeList() {
             const select = document.getElementById('employeeId');
+            
+            // Clear existing options
             select.innerHTML = '<option value="">-- Select Employee ID --</option>';
 
-            if (window.employeeData && window.employeeData.employees) {
+            // Check if data exists
+            if (window.employeeData && window.employeeData.employees && window.employeeData.employees.length > 0) {
                 window.employeeData.employees.forEach(emp => {
                     const option = document.createElement('option');
                     option.value = emp.employee_id;
@@ -659,8 +663,10 @@
                     select.appendChild(option);
                 });
                 document.getElementById('noEmployeeData').style.display = 'none';
+                document.querySelector('.employee-selector').style.display = 'block';
             } else {
                 document.getElementById('noEmployeeData').style.display = 'block';
+                document.querySelector('.employee-selector').style.display = 'none';
             }
         }
 
