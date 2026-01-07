@@ -3,537 +3,399 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR Portal - Leave Management</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        .portal-card {
-            background: white;
-            border-radius: 15px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-
-        .lock-screen {
-            text-align: center;
-            padding: 60px 20px;
-        }
-
-        .lock-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-        }
-
-        .lock-screen h2 {
-            color: #dc3545;
-            margin-bottom: 15px;
-            font-size: 1.8rem;
-        }
-
-        .lock-screen p {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 1.1rem;
-        }
-
-        .pin-input {
-            width: 100%;
-            max-width: 300px;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1.2rem;
-            text-align: center;
-            letter-spacing: 8px;
-            margin: 0 auto 20px;
-            display: block;
-        }
-
-        .pin-input:focus {
-            outline: none;
-            border-color: #dc3545;
-        }
-
-        .unlock-btn {
-            padding: 15px 50px;
-            background: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .unlock-btn:hover {
-            background: #c82333;
-            transform: translateY(-2px);
-        }
-
-        .main-content {
-            display: none;
-        }
-
-        .main-content.unlocked {
-            display: block;
-        }
-
-        .upload-section {
-            border: 3px dashed #dc3545;
-            border-radius: 10px;
-            padding: 40px;
-            text-align: center;
-            background: #fff5f5;
-            margin-bottom: 30px;
-            transition: all 0.3s;
-        }
-
-        .upload-section:hover {
-            background: #ffe6e6;
-            border-color: #c82333;
-        }
-
-        .file-input-wrapper {
-            position: relative;
-            display: inline-block;
-        }
-
-        .file-input {
-            display: none;
-        }
-
-        .file-label {
-            display: inline-block;
-            padding: 15px 40px;
-            background: #dc3545;
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .file-label:hover {
-            background: #c82333;
-            transform: translateY(-2px);
-        }
-
-        .file-info {
-            margin-top: 20px;
-            padding: 15px;
-            background: white;
-            border-radius: 8px;
-            display: none;
-        }
-
-        .file-info.show {
-            display: block;
-        }
-
-        .file-name {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .remove-btn {
-            padding: 8px 20px;
-            background: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .remove-btn:hover {
-            background: #c82333;
-        }
-
-        .message {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .message.show {
-            display: block;
-        }
-
-        .message.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .preview-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .preview-table th,
-        .preview-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .preview-table th {
-            background: #dc3545;
-            color: white;
-            font-weight: 600;
-        }
-
-        .preview-table tr:hover {
-            background: #fff5f5;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .loading.show {
-            display: block;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #dc3545;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .logout-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 10px 25px;
-            background: white;
-            color: #dc3545;
-            border: 2px solid white;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .logout-btn:hover {
-            background: transparent;
-            color: white;
-        }
-
-        .nav-link {
-            text-align: center;
-            margin-top: 30px;
-            padding-top: 30px;
-            border-top: 2px solid #e0e0e0;
-        }
-
-        .nav-link a {
-            color: #dc3545;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s;
-        }
-
-        .nav-link a:hover {
-            color: #c82333;
-        }
-
-        @media (max-width: 768px) {
-            .portal-card {
-                padding: 20px;
-            }
-
-            .header h1 {
-                font-size: 1.8rem;
-            }
-
-            .logout-btn {
-                position: static;
-                margin-bottom: 20px;
-                width: 100%;
-            }
-        }
-    </style>
+    <title>HR Portal - Leave Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>🏢 HR Portal</h1>
-            <p>Leave Management System</p>
+        <div class="nav-header">
+            <h1><i class="fas fa-users-cog"></i> HR Portal - Employee Leave Management</h1>
+            <div class="nav-links">
+                <a href="index.html" class="btn"><i class="fas fa-home"></i> Home</a>
+                <a href="employee-portal.html" class="btn btn-secondary"><i class="fas fa-user-tie"></i> Employee Portal</a>
+            </div>
         </div>
-
-        <div class="portal-card">
-            <button class="logout-btn" id="logoutBtn" style="display: none;" onclick="logout()">🔒 Lock Portal</button>
-
-            <!-- Lock Screen -->
-            <div id="lockScreen" class="lock-screen">
-                <div class="lock-icon">🔐</div>
-                <h2>HR Access Required</h2>
-                <p>Enter PIN to access the HR Portal</p>
-                <input 
-                    type="password" 
-                    id="pinInput" 
-                    class="pin-input" 
-                    placeholder="••••" 
-                    maxlength="4"
-                    onkeypress="if(event.key === 'Enter') unlockPortal()"
-                >
-                <button class="unlock-btn" onclick="unlockPortal()">Unlock Portal</button>
-                <div class="message" id="lockMessage"></div>
-                <p style="margin-top: 30px; color: #999; font-size: 0.9rem;">Default PIN: 1234</p>
+        
+        <div class="alert alert-info">
+            <h3><i class="fas fa-info-circle"></i> Instructions</h3>
+            <p>Upload an Excel file with employee data or manage existing data. The system will automatically save to localStorage and update the Excel file.</p>
+        </div>
+        
+        <div class="card">
+            <h2><i class="fas fa-file-upload"></i> Upload Employee Data</h2>
+            <p>Upload an Excel file (.xls, .xlsx) containing employee leave and attendance data.</p>
+            
+            <div class="form-group">
+                <label for="excelFile">Select Excel File</label>
+                <input type="file" id="excelFile" class="form-control" accept=".xls,.xlsx">
+                <small>File should include columns: employee_id, name, department, total_annual_leaves, sick_leaves, leaves_taken, late_entries, late_deduction_rate, total_late_deduction</small>
             </div>
-
-            <!-- Main Content -->
-            <div id="mainContent" class="main-content">
-                <h2 style="color: #dc3545; margin-bottom: 20px;">HR Data Upload</h2>
+            
+            <button id="uploadBtn" class="btn btn-primary">
+                <i class="fas fa-upload"></i> Upload & Process File
+            </button>
+            
+            <div id="uploadResult" style="margin-top: 20px;"></div>
+        </div>
+        
+        <div class="card">
+            <h2><i class="fas fa-database"></i> Current Employee Data</h2>
+            <p>Data currently stored in the system (loaded from Excel file or localStorage).</p>
+            
+            <div id="dataActions" style="margin-bottom: 20px;">
+                <button id="loadDataBtn" class="btn">
+                    <i class="fas fa-sync"></i> Load/Refresh Data
+                </button>
+                <button id="clearDataBtn" class="btn" style="background-color: #f44336; color: white;">
+                    <i class="fas fa-trash"></i> Clear All Data
+                </button>
+            </div>
+            
+            <div id="employeeDataContainer">
+                <!-- Employee data will be loaded here -->
+                <p>No employee data loaded yet. Upload an Excel file or load sample data.</p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2><i class="fas fa-plus-circle"></i> Add/Edit Employee Manually</h2>
+            <p>Add a new employee or edit existing employee data.</p>
+            
+            <form id="employeeForm">
+                <div class="form-group">
+                    <label for="empId">Employee ID *</label>
+                    <input type="text" id="empId" class="form-control" required>
+                </div>
                 
-                <div class="message" id="hrMessage"></div>
-
-                <div class="upload-section">
-                    <h3 style="color: #dc3545; margin-bottom: 15px;">📄 Upload Employee Data</h3>
-                    <p style="color: #666; margin-bottom: 20px;">Upload an Excel file (.xls or .xlsx) containing employee leave and attendance data</p>
+                <div class="form-group">
+                    <label for="empName">Employee Name *</label>
+                    <input type="text" id="empName" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="empDept">Department</label>
+                    <input type="text" id="empDept" class="form-control">
+                </div>
+                
+                <div class="form-row" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                    <div class="form-group">
+                        <label for="annualLeaves">Annual Leaves</label>
+                        <input type="number" id="annualLeaves" class="form-control" value="20">
+                    </div>
                     
-                    <div class="file-input-wrapper">
-                        <input type="file" id="fileInput" class="file-input" accept=".xlsx, .xls" onchange="handleFileUpload(event)">
-                        <label for="fileInput" class="file-label">Choose Excel File</label>
-                    </div>
-
-                    <div class="file-info" id="fileInfo">
-                        <div class="file-name" id="fileName"></div>
-                        <button class="remove-btn" onclick="removeFile()">Remove File</button>
+                    <div class="form-group">
+                        <label for="sickLeaves">Sick Leaves</label>
+                        <input type="number" id="sickLeaves" class="form-control" value="10">
                     </div>
                 </div>
-
-                <div class="loading" id="loading">
-                    <div class="spinner"></div>
-                    <p style="margin-top: 15px; color: #dc3545; font-weight: 600;">Processing data...</p>
+                
+                <div class="form-row" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                    <div class="form-group">
+                        <label for="leavesTaken">Leaves Taken</label>
+                        <input type="number" id="leavesTaken" class="form-control" value="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="deductionRate">Late Deduction Rate ($ per day)</label>
+                        <input type="number" step="0.01" id="deductionRate" class="form-control" value="10.50">
+                    </div>
                 </div>
-
-                <div id="dataPreview"></div>
-
-                <div class="nav-link">
-                    <a href="employee-portal.html">→ Go to Employee Portal</a>
+                
+                <div class="form-group">
+                    <label for="lateEntries">Late Entries (comma or semicolon separated dates)</label>
+                    <textarea id="lateEntries" class="form-control" rows="3" placeholder="2023-10-01 09:30; 2023-10-15 10:00"></textarea>
                 </div>
-            </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Employee
+                </button>
+                <button type="button" id="clearFormBtn" class="btn">
+                    <i class="fas fa-times"></i> Clear Form
+                </button>
+            </form>
+        </div>
+        
+        <div class="footer">
+            <p>HR Portal - Leave Management System &copy; 2023 | <a href="index.html">Return to Home</a></p>
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="script.js"></script>
     <script>
-        const HR_PIN = '1234'; // Change this to your desired PIN
-        let uploadedFile = null;
-
-        function unlockPortal() {
-            const pin = document.getElementById('pinInput').value;
+        // HR Portal specific JavaScript
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Load existing data on page load
+            await loadAndDisplayData();
             
-            if (pin === HR_PIN) {
-                document.getElementById('lockScreen').style.display = 'none';
-                document.getElementById('mainContent').classList.add('unlocked');
-                document.getElementById('logoutBtn').style.display = 'block';
-                document.getElementById('pinInput').value = '';
-            } else {
-                showMessage('lockMessage', '❌ Invalid PIN. Please try again.', 'error');
-            }
-        }
-
-        function logout() {
-            document.getElementById('lockScreen').style.display = 'block';
-            document.getElementById('mainContent').classList.remove('unlocked');
-            document.getElementById('logoutBtn').style.display = 'none';
-            document.getElementById('pinInput').value = '';
-        }
-
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const validTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 
-                               'application/vnd.ms-excel'];
-            if (!validTypes.includes(file.type) && !file.name.match(/\.(xlsx|xls)$/)) {
-                showMessage('hrMessage', 'Invalid file type. Please upload an Excel file (.xlsx or .xls)', 'error');
+            // File upload handler
+            document.getElementById('uploadBtn').addEventListener('click', handleFileUpload);
+            
+            // Load data button
+            document.getElementById('loadDataBtn').addEventListener('click', async function() {
+                await loadAndDisplayData();
+                showMessage('Data loaded successfully!', 'success');
+            });
+            
+            // Clear data button
+            document.getElementById('clearDataBtn').addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear all employee data?')) {
+                    localStorage.removeItem('hr_employee_data');
+                    document.getElementById('employeeDataContainer').innerHTML = 
+                        '<p>All employee data has been cleared.</p>';
+                    showMessage('All data cleared successfully!', 'success');
+                }
+            });
+            
+            // Employee form submission
+            document.getElementById('employeeForm').addEventListener('submit', handleEmployeeFormSubmit);
+            
+            // Clear form button
+            document.getElementById('clearFormBtn').addEventListener('click', function() {
+                document.getElementById('employeeForm').reset();
+            });
+        });
+        
+        // Handle Excel file upload
+        async function handleFileUpload() {
+            const fileInput = document.getElementById('excelFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showMessage('Please select an Excel file first.', 'error');
                 return;
             }
-
-            uploadedFile = file;
-            document.getElementById('fileName').textContent = `📁 ${file.name}`;
-            document.getElementById('fileInfo').classList.add('show');
-            document.getElementById('loading').classList.add('show');
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const jsonData = XLSX.utils.sheet_to_json(firstSheet);
-
-                    if (jsonData.length === 0) {
-                        throw new Error('Excel file is empty');
-                    }
-
-                    processEmployeeData(jsonData);
-                } catch (error) {
-                    document.getElementById('loading').classList.remove('show');
-                    showMessage('hrMessage', `Error parsing file: ${error.message}`, 'error');
-                }
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        function processEmployeeData(data) {
+            
             try {
-                const employees = data.map(row => {
-                    const lateEntries = row.late_entries 
-                        ? row.late_entries.toString().split(';').map(e => e.trim()).filter(e => e)
-                        : [];
-                    
-                    const totalLeaves = parseInt(row.total_annual_leaves) || 0;
-                    const leavesTaken = parseInt(row.leaves_taken) || 0;
-                    const leavesRemaining = totalLeaves - leavesTaken;
-
-                    return {
-                        employee_id: row.employee_id?.toString() || '',
-                        employee_pin: row.employee_pin?.toString() || '',
-                        total_annual_leaves: totalLeaves,
-                        sick_leaves: parseInt(row.sick_leaves) || 0,
-                        leaves_taken: leavesTaken,
-                        leaves_remaining: leavesRemaining,
-                        late_entries: lateEntries,
-                        late_deduction_rate: parseFloat(row.late_deduction_rate) || 0,
-                        total_late_deduction: parseFloat(row.total_late_deduction) || 0
-                    };
-                });
-
-                window.employeeData = { employees };
-
-                document.getElementById('loading').classList.remove('show');
-                showMessage('hrMessage', `✓ Successfully uploaded data for ${employees.length} employees`, 'success');
-                displayUploadedData(employees);
+                const XLSX = window.XLSX;
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        
+                        // Get first worksheet
+                        const worksheetName = workbook.SheetNames[0];
+                        const worksheet = workbook.Sheets[worksheetName];
+                        
+                        // Convert to JSON
+                        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                        
+                        // Process the data
+                        const employees = jsonData.map(row => {
+                            // Handle late entries (could be string or array)
+                            let lateEntries = [];
+                            if (row.late_entries) {
+                                if (typeof row.late_entries === 'string') {
+                                    lateEntries = row.late_entries.split(';').map(entry => entry.trim()).filter(entry => entry);
+                                } else if (Array.isArray(row.late_entries)) {
+                                    lateEntries = row.late_entries;
+                                }
+                            }
+                            
+                            // Calculate leaves remaining if not provided
+                            const leavesRemaining = row.leaves_remaining !== undefined 
+                                ? row.leaves_remaining 
+                                : (row.total_annual_leaves || 0) - (row.leaves_taken || 0);
+                            
+                            return {
+                                employee_id: row.employee_id || row.employeeId || row.id || `EMP${Math.floor(100 + Math.random() * 900)}`,
+                                name: row.name || row.employee_name || 'Unknown',
+                                department: row.department || '',
+                                total_annual_leaves: row.total_annual_leaves || row.annual_leaves || 20,
+                                sick_leaves: row.sick_leaves || 10,
+                                leaves_taken: row.leaves_taken || row.leaves_used || 0,
+                                leaves_remaining: leavesRemaining,
+                                late_entries: lateEntries,
+                                late_deduction_rate: row.late_deduction_rate || row.deduction_rate || 10.50,
+                                total_late_deduction: row.total_late_deduction || row.late_deduction || 0
+                            };
+                        });
+                        
+                        // Save to localStorage
+                        saveToLocalStorage('hr_employee_data', employees);
+                        
+                        // Display the data
+                        displayEmployeeTable(employees, 'employeeDataContainer');
+                        
+                        // Show success message
+                        showMessage(`Successfully uploaded and processed ${employees.length} employee records!`, 'success');
+                        
+                        // Generate and download updated Excel file
+                        generateExcelFile(employees);
+                        
+                    } catch (error) {
+                        console.error('Error processing file:', error);
+                        showMessage('Error processing Excel file: ' + error.message, 'error');
+                    }
+                };
+                
+                reader.readAsArrayBuffer(file);
+                
             } catch (error) {
-                document.getElementById('loading').classList.remove('show');
-                showMessage('hrMessage', `Error processing data: ${error.message}`, 'error');
+                console.error('Error reading file:', error);
+                showMessage('Error reading file: ' + error.message, 'error');
             }
         }
-
-        function displayUploadedData(employees) {
-            const preview = document.getElementById('dataPreview');
-            const displayCount = Math.min(5, employees.length);
+        
+        // Load and display data from localStorage or Excel file
+        async function loadAndDisplayData() {
+            // Try to load from localStorage first
+            let employees = loadFromLocalStorage('hr_employee_data');
             
-            let html = `
-                <h3 style="color: #dc3545; margin: 30px 0 15px 0;">📊 Data Preview (First ${displayCount} rows)</h3>
-                <table class="preview-table">
-                    <thead>
-                        <tr>
-                            <th>Employee ID</th>
-                            <th>PIN Set</th>
-                            <th>Total Leaves</th>
-                            <th>Leaves Taken</th>
-                            <th>Remaining</th>
-                            <th>Late Days</th>
-                            <th>Deduction</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            employees.slice(0, displayCount).forEach(emp => {
-                html += `
-                    <tr>
-                        <td>${emp.employee_id}</td>
-                        <td>${emp.employee_pin ? '✓ Yes' : '✗ No'}</td>
-                        <td>${emp.total_annual_leaves}</td>
-                        <td>${emp.leaves_taken}</td>
-                        <td>${emp.leaves_remaining}</td>
-                        <td>${emp.late_entries.length}</td>
-                        <td>$${emp.total_late_deduction}</td>
-                    </tr>
-                `;
-            });
-
-            html += `
-                    </tbody>
-                </table>
-                <p style="margin-top: 15px; color: #666; text-align: center;">
-                    Total employees: ${employees.length}
-                </p>
-            `;
-
-            preview.innerHTML = html;
+            if (!employees || employees.length === 0) {
+                // If no data in localStorage, try to read from Excel file
+                try {
+                    employees = await readExcelFile('employee_data.xlsx');
+                    if (!employees || employees.length === 0) {
+                        employees = await readExcelFile('sample_data.xlsx');
+                    }
+                    
+                    if (employees && employees.length > 0) {
+                        // Save to localStorage for future use
+                        saveToLocalStorage('hr_employee_data', employees);
+                    }
+                } catch (error) {
+                    console.warn('Could not load data from Excel file:', error);
+                }
+            }
+            
+            // If still no data, use sample data
+            if (!employees || employees.length === 0) {
+                employees = sampleEmployees;
+                saveToLocalStorage('hr_employee_data', employees);
+            }
+            
+            // Display the data
+            if (employees && employees.length > 0) {
+                displayEmployeeTable(employees, 'employeeDataContainer');
+            } else {
+                document.getElementById('employeeDataContainer').innerHTML = 
+                    '<p>No employee data available. Please upload an Excel file or add employees manually.</p>';
+            }
         }
-
-        function removeFile() {
-            uploadedFile = null;
-            document.getElementById('fileInput').value = '';
-            document.getElementById('fileInfo').classList.remove('show');
-            document.getElementById('dataPreview').innerHTML = '';
-            document.getElementById('hrMessage').classList.remove('show');
-            window.employeeData = null;
+        
+        // Handle employee form submission
+        function handleEmployeeFormSubmit(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const empId = document.getElementById('empId').value.trim();
+            const empName = document.getElementById('empName').value.trim();
+            const empDept = document.getElementById('empDept').value.trim();
+            const annualLeaves = parseInt(document.getElementById('annualLeaves').value) || 20;
+            const sickLeaves = parseInt(document.getElementById('sickLeaves').value) || 10;
+            const leavesTaken = parseInt(document.getElementById('leavesTaken').value) || 0;
+            const deductionRate = parseFloat(document.getElementById('deductionRate').value) || 10.50;
+            const lateEntriesText = document.getElementById('lateEntries').value.trim();
+            
+            // Process late entries
+            let lateEntries = [];
+            if (lateEntriesText) {
+                lateEntries = lateEntriesText.split(/[;,]/).map(entry => entry.trim()).filter(entry => entry);
+            }
+            
+            // Calculate leaves remaining
+            const leavesRemaining = annualLeaves - leavesTaken;
+            
+            // Calculate total late deduction
+            const totalLateDeduction = lateEntries.length * deductionRate;
+            
+            // Create employee object
+            const employee = {
+                employee_id: empId,
+                name: empName,
+                department: empDept,
+                total_annual_leaves: annualLeaves,
+                sick_leaves: sickLeaves,
+                leaves_taken: leavesTaken,
+                leaves_remaining: leavesRemaining,
+                late_entries: lateEntries,
+                late_deduction_rate: deductionRate,
+                total_late_deduction: totalLateDeduction
+            };
+            
+            // Load existing employees
+            let employees = loadFromLocalStorage('hr_employee_data') || [];
+            
+            // Check if employee already exists
+            const existingIndex = employees.findIndex(emp => emp.employee_id === empId);
+            
+            if (existingIndex >= 0) {
+                // Update existing employee
+                employees[existingIndex] = employee;
+                showMessage(`Employee ${empId} updated successfully!`, 'success');
+            } else {
+                // Add new employee
+                employees.push(employee);
+                showMessage(`Employee ${empId} added successfully!`, 'success');
+            }
+            
+            // Save to localStorage
+            saveToLocalStorage('hr_employee_data', employees);
+            
+            // Regenerate Excel file
+            generateExcelFile(employees);
+            
+            // Refresh display
+            displayEmployeeTable(employees, 'employeeDataContainer');
+            
+            // Reset form
+            document.getElementById('employeeForm').reset();
         }
-
-        function showMessage(elementId, message, type) {
-            const messageEl = document.getElementById(elementId);
-            messageEl.textContent = message;
-            messageEl.className = `message ${type} show`;
+        
+        // Generate and download Excel file
+        function generateExcelFile(employees) {
+            try {
+                const XLSX = window.XLSX;
+                
+                // Convert employees to worksheet
+                const worksheet = XLSX.utils.json_to_sheet(employees.map(emp => ({
+                    employee_id: emp.employee_id,
+                    name: emp.name,
+                    department: emp.department,
+                    total_annual_leaves: emp.total_annual_leaves,
+                    sick_leaves: emp.sick_leaves,
+                    leaves_taken: emp.leaves_taken,
+                    leaves_remaining: emp.leaves_remaining,
+                    late_entries: emp.late_entries ? emp.late_entries.join('; ') : '',
+                    late_deduction_rate: emp.late_deduction_rate,
+                    total_late_deduction: emp.total_late_deduction
+                })));
+                
+                // Create workbook
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Employees");
+                
+                // Generate file and trigger download
+                XLSX.writeFile(workbook, "employee_data.xlsx");
+                
+                console.log('Excel file generated successfully');
+                return true;
+                
+            } catch (error) {
+                console.error('Error generating Excel file:', error);
+                showMessage('Error generating Excel file. Data saved to localStorage only.', 'error');
+                return false;
+            }
+        }
+        
+        // Show message to user
+        function showMessage(message, type = 'info') {
+            const resultDiv = document.getElementById('uploadResult');
+            resultDiv.innerHTML = `
+                <div class="alert ${type === 'success' ? 'alert-success' : 'alert-info'}" 
+                     style="background-color: ${type === 'error' ? '#ffebee' : type === 'success' ? '#e8f6ef' : '#e8f4fd'};
+                            border-left-color: ${type === 'error' ? '#f44336' : type === 'success' ? '#4CAF50' : '#2a5298'};">
+                    <strong>${type === 'error' ? 'Error:' : type === 'success' ? 'Success:' : 'Info:'}</strong> ${message}
+                </div>
+            `;
+            
+            // Auto-hide message after 5 seconds
             setTimeout(() => {
-                messageEl.classList.remove('show');
+                resultDiv.innerHTML = '';
             }, 5000);
         }
     </script>
