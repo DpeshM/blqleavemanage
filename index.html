@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Leave Management System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .portal-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .portal-selector {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .portal-btn {
+            flex: 1;
+            max-width: 300px;
+            padding: 15px 30px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .portal-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .portal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .portal-content {
+            display: none;
+        }
+
+        .portal-content.active {
+            display: block;
+        }
+
+        .upload-section {
+            border: 3px dashed #667eea;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            background: #f8f9ff;
+            margin-bottom: 30px;
+            transition: all 0.3s;
+        }
+
+        .upload-section:hover {
+            background: #f0f2ff;
+            border-color: #764ba2;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            display: inline-block;
+            padding: 15px 40px;
+            background: #667eea;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .file-label:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .file-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .file-info.show {
+            display: block;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .remove-btn {
+            padding: 8px 20px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .remove-btn:hover {
+            background: #c82333;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .employee-selector {
+            margin-bottom: 30px;
+        }
+
+        .employee-selector label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .employee-selector select,
+        .employee-selector input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .employee-selector select:focus,
+        .employee-selector input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .view-btn {
+            width: 100%;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+
+        .view-btn:hover {
+            background: #764ba2;
+        }
+
+        .employee-details {
+            display: none;
+        }
+
+        .employee-details.show {
+            display: block;
+        }
+
+        .detail-card {
+            background: #f8f9ff;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .detail-card h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .detail-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .detail-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .late-entries {
+            margin-top: 20px;
+        }
+
+        .late-entry {
+            background: white;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .late-date {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .late-time {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .preview-table th,
+        .preview-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .preview-table th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        .preview-table tr:hover {
+            background: #f8f9ff;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .portal-card {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .portal-selector {
+                flex-direction: column;
+            }
+
+            .portal-btn {
+                max-width: 100%;
+            }
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏢 HR Leave Management System</h1>
+            <p>Streamlined Leave & Attendance Tracking</p>
+        </div>
+
+        <div class="portal-card">
+            <div class="portal-selector">
+                <button class="portal-btn active" onclick="switchPortal('hr')">HR Portal</button>
+                <button class="portal-btn" onclick="switchPortal('employee')">Employee Portal</button>
+            </div>
+
+            <!-- HR Portal -->
+            <div id="hr-portal" class="portal-content active">
+                <h2 style="color: #667eea; margin-bottom: 20px;">HR Data Upload</h2>
+                
+                <div class="message" id="hr-message"></div>
+
+                <div class="upload-section">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">📄 Upload Employee Data</h3>
+                    <p style="color: #666; margin-bottom: 20px;">Upload an Excel file (.xls or .xlsx) containing employee leave and attendance data</p>
+                    
+                    <div class="file-input-wrapper">
+                        <input type="file" id="fileInput" class="file-input" accept=".xlsx, .xls" onchange="handleFileUpload(event)">
+                        <label for="fileInput" class="file-label">Choose Excel File</label>
+                    </div>
+
+                    <div class="file-info" id="fileInfo">
+                        <div class="file-name" id="fileName"></div>
+                        <button class="remove-btn" onclick="removeFile()">Remove File</button>
+                    </div>
+                </div>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 15px; color: #667eea; font-weight: 600;">Processing data...</p>
+                </div>
+
+                <div id="dataPreview"></div>
+            </div>
+
+            <!-- Employee Portal -->
+            <div id="employee-portal" class="portal-content">
+                <h2 style="color: #667eea; margin-bottom: 20px;">Employee Leave Details</h2>
+                
+                <div class="message" id="employee-message"></div>
+
+                <div class="employee-selector">
+                    <label for="employeeId">Select Your Employee ID</label>
+                    <select id="employeeId" onchange="loadEmployeeList()">
+                        <option value="">-- Select Employee ID --</option>
+                    </select>
+                    <button class="view-btn" onclick="viewEmployeeDetails()">View My Details</button>
+                </div>
+
+                <div class="employee-details" id="employeeDetails">
+                    <div class="detail-card">
+                        <h3>📋 Leave Summary</h3>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <div class="detail-label">Total Annual Leaves</div>
+                                <div class="detail-value" id="totalLeaves">-</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Sick Leaves</div>
+                                <div class="detail-value" id="sickLeaves">-</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Leaves Taken</div>
+                                <div class="detail-value" id="leavesTaken">-</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Leaves Remaining</div>
+                                <div class="detail-value" style="color: #28a745;" id="leavesRemaining">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-card">
+                        <h3>⏰ Late Attendance Summary</h3>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <div class="detail-label">Total Late Days</div>
+                                <div class="detail-value" style="color: #dc3545;" id="lateDays">-</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Deduction Rate</div>
+                                <div class="detail-value" id="deductionRate">-</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Total Deduction</div>
+                                <div class="detail-value" style="color: #dc3545;" id="totalDeduction">-</div>
+                            </div>
+                        </div>
+
+                        <div class="late-entries" id="lateEntriesList"></div>
+                    </div>
+                </div>
+
+                <div class="no-data" id="noEmployeeData" style="display: none;">
+                    <p>No employee data found. Please contact HR to upload employee data.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let uploadedFile = null;
+
+        function switchPortal(portal) {
+            const hrPortal = document.getElementById('hr-portal');
+            const employeePortal = document.getElementById('employee-portal');
+            const buttons = document.querySelectorAll('.portal-btn');
+
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            if (portal === 'hr') {
+                hrPortal.classList.add('active');
+                employeePortal.classList.remove('active');
+                buttons[0].classList.add('active');
+            } else {
+                hrPortal.classList.remove('active');
+                employeePortal.classList.add('active');
+                buttons[1].classList.add('active');
+                loadEmployeeList();
+            }
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Validate file type
+            const validTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 
+                               'application/vnd.ms-excel'];
+            if (!validTypes.includes(file.type) && !file.name.match(/\.(xlsx|xls)$/)) {
+                showMessage('hr-message', 'Invalid file type. Please upload an Excel file (.xlsx or .xls)', 'error');
+                return;
+            }
+
+            uploadedFile = file;
+            document.getElementById('fileName').textContent = `📁 ${file.name}`;
+            document.getElementById('fileInfo').classList.add('show');
+            document.getElementById('loading').classList.add('show');
+
+            // Parse Excel file
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+
+                    if (jsonData.length === 0) {
+                        throw new Error('Excel file is empty');
+                    }
+
+                    processEmployeeData(jsonData);
+                } catch (error) {
+                    document.getElementById('loading').classList.remove('show');
+                    showMessage('hr-message', `Error parsing file: ${error.message}`, 'error');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function processEmployeeData(data) {
+            try {
+                const employees = data.map(row => {
+                    const lateEntries = row.late_entries 
+                        ? row.late_entries.toString().split(';').map(e => e.trim()).filter(e => e)
+                        : [];
+                    
+                    const totalLeaves = parseInt(row.total_annual_leaves) || 0;
+                    const leavesTaken = parseInt(row.leaves_taken) || 0;
+                    const leavesRemaining = totalLeaves - leavesTaken;
+
+                    return {
+                        employee_id: row.employee_id?.toString() || '',
+                        total_annual_leaves: totalLeaves,
+                        sick_leaves: parseInt(row.sick_leaves) || 0,
+                        leaves_taken: leavesTaken,
+                        leaves_remaining: leavesRemaining,
+                        late_entries: lateEntries,
+                        late_deduction_rate: parseFloat(row.late_deduction_rate) || 0,
+                        total_late_deduction: parseFloat(row.total_late_deduction) || 0
+                    };
+                });
+
+                // Store in memory (not localStorage as per instructions)
+                window.employeeData = { employees };
+
+                document.getElementById('loading').classList.remove('show');
+                showMessage('hr-message', `✓ Successfully uploaded data for ${employees.length} employees`, 'success');
+                displayUploadedData(employees);
+            } catch (error) {
+                document.getElementById('loading').classList.remove('show');
+                showMessage('hr-message', `Error processing data: ${error.message}`, 'error');
+            }
+        }
+
+        function displayUploadedData(employees) {
+            const preview = document.getElementById('dataPreview');
+            const displayCount = Math.min(5, employees.length);
+            
+            let html = `
+                <h3 style="color: #667eea; margin: 30px 0 15px 0;">📊 Data Preview (First ${displayCount} rows)</h3>
+                <table class="preview-table">
+                    <thead>
+                        <tr>
+                            <th>Employee ID</th>
+                            <th>Total Leaves</th>
+                            <th>Leaves Taken</th>
+                            <th>Remaining</th>
+                            <th>Late Days</th>
+                            <th>Deduction</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            employees.slice(0, displayCount).forEach(emp => {
+                html += `
+                    <tr>
+                        <td>${emp.employee_id}</td>
+                        <td>${emp.total_annual_leaves}</td>
+                        <td>${emp.leaves_taken}</td>
+                        <td>${emp.leaves_remaining}</td>
+                        <td>${emp.late_entries.length}</td>
+                        <td>$${emp.total_late_deduction}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+                <p style="margin-top: 15px; color: #666; text-align: center;">
+                    Total employees: ${employees.length}
+                </p>
+            `;
+
+            preview.innerHTML = html;
+        }
+
+        function removeFile() {
+            uploadedFile = null;
+            document.getElementById('fileInput').value = '';
+            document.getElementById('fileInfo').classList.remove('show');
+            document.getElementById('dataPreview').innerHTML = '';
+            document.getElementById('hr-message').classList.remove('show');
+            window.employeeData = null;
+        }
+
+        function showMessage(elementId, message, type) {
+            const messageEl = document.getElementById(elementId);
+            messageEl.textContent = message;
+            messageEl.className = `message ${type} show`;
+            setTimeout(() => {
+                messageEl.classList.remove('show');
+            }, 5000);
+        }
+
+        function loadEmployeeList() {
+            const select = document.getElementById('employeeId');
+            select.innerHTML = '<option value="">-- Select Employee ID --</option>';
+
+            if (window.employeeData && window.employeeData.employees) {
+                window.employeeData.employees.forEach(emp => {
+                    const option = document.createElement('option');
+                    option.value = emp.employee_id;
+                    option.textContent = emp.employee_id;
+                    select.appendChild(option);
+                });
+                document.getElementById('noEmployeeData').style.display = 'none';
+            } else {
+                document.getElementById('noEmployeeData').style.display = 'block';
+            }
+        }
+
+        function viewEmployeeDetails() {
+            const employeeId = document.getElementById('employeeId').value;
+            
+            if (!employeeId) {
+                showMessage('employee-message', 'Please select an employee ID', 'error');
+                return;
+            }
+
+            if (!window.employeeData || !window.employeeData.employees) {
+                showMessage('employee-message', 'No employee data available', 'error');
+                return;
+            }
+
+            const employee = window.employeeData.employees.find(e => e.employee_id === employeeId);
+
+            if (!employee) {
+                showMessage('employee-message', 'Employee not found', 'error');
+                return;
+            }
+
+            // Display employee details
+            document.getElementById('totalLeaves').textContent = employee.total_annual_leaves;
+            document.getElementById('sickLeaves').textContent = employee.sick_leaves;
+            document.getElementById('leavesTaken').textContent = employee.leaves_taken;
+            document.getElementById('leavesRemaining').textContent = employee.leaves_remaining;
+            document.getElementById('lateDays').textContent = employee.late_entries.length;
+            document.getElementById('deductionRate').textContent = `$${employee.late_deduction_rate}`;
+            document.getElementById('totalDeduction').textContent = `$${employee.total_late_deduction}`;
+
+            // Display late entries
+            const lateEntriesList = document.getElementById('lateEntriesList');
+            if (employee.late_entries.length > 0) {
+                let lateHtml = '<h4 style="color: #667eea; margin: 20px 0 15px 0;">Late Entry Records</h4>';
+                employee.late_entries.forEach(entry => {
+                    const [date, time] = entry.split(' ');
+                    lateHtml += `
+                        <div class="late-entry">
+                            <span class="late-date">📅 ${date}</span>
+                            <span class="late-time">🕐 ${time}</span>
+                        </div>
+                    `;
+                });
+                lateEntriesList.innerHTML = lateHtml;
+            } else {
+                lateEntriesList.innerHTML = '<p style="color: #28a745; text-align: center; margin-top: 20px;">✓ No late entries recorded</p>';
+            }
+
+            document.getElementById('employeeDetails').classList.add('show');
+            document.getElementById('noEmployeeData').style.display = 'none';
+            showMessage('employee-message', `✓ Details loaded for ${employeeId}`, 'success');
+        }
+
+        // Initialize employee list on page load if data exists
+        window.addEventListener('load', () => {
+            if (window.employeeData) {
+                loadEmployeeList();
+            }
+        });
+    </script>
+</body>
+</html>
