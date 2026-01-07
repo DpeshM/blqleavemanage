@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Portal - Leave Management</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .portal-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .lock-screen {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .lock-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .lock-screen h2 {
+            color: #dc3545;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+
+        .lock-screen p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .pin-input {
+            width: 100%;
+            max-width: 300px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            text-align: center;
+            letter-spacing: 8px;
+            margin: 0 auto 20px;
+            display: block;
+        }
+
+        .pin-input:focus {
+            outline: none;
+            border-color: #dc3545;
+        }
+
+        .unlock-btn {
+            padding: 15px 50px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .unlock-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .main-content {
+            display: none;
+        }
+
+        .main-content.unlocked {
+            display: block;
+        }
+
+        .upload-section {
+            border: 3px dashed #dc3545;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            background: #fff5f5;
+            margin-bottom: 30px;
+            transition: all 0.3s;
+        }
+
+        .upload-section:hover {
+            background: #ffe6e6;
+            border-color: #c82333;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            display: inline-block;
+            padding: 15px 40px;
+            background: #dc3545;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .file-label:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .file-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .file-info.show {
+            display: block;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .remove-btn {
+            padding: 8px 20px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .remove-btn:hover {
+            background: #c82333;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .preview-table th,
+        .preview-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .preview-table th {
+            background: #dc3545;
+            color: white;
+            font-weight: 600;
+        }
+
+        .preview-table tr:hover {
+            background: #fff5f5;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #dc3545;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 25px;
+            background: white;
+            color: #dc3545;
+            border: 2px solid white;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: transparent;
+            color: white;
+        }
+
+        .nav-link {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .nav-link a {
+            color: #dc3545;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .nav-link a:hover {
+            color: #c82333;
+        }
+
+        @media (max-width: 768px) {
+            .portal-card {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .logout-btn {
+                position: static;
+                margin-bottom: 20px;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏢 HR Portal</h1>
+            <p>Leave Management System</p>
+        </div>
+
+        <div class="portal-card">
+            <button class="logout-btn" id="logoutBtn" style="display: none;" onclick="logout()">🔒 Lock Portal</button>
+
+            <!-- Lock Screen -->
+            <div id="lockScreen" class="lock-screen">
+                <div class="lock-icon">🔐</div>
+                <h2>HR Access Required</h2>
+                <p>Enter PIN to access the HR Portal</p>
+                <input 
+                    type="password" 
+                    id="pinInput" 
+                    class="pin-input" 
+                    placeholder="••••" 
+                    maxlength="4"
+                    onkeypress="if(event.key === 'Enter') unlockPortal()"
+                >
+                <button class="unlock-btn" onclick="unlockPortal()">Unlock Portal</button>
+                <div class="message" id="lockMessage"></div>
+                <p style="margin-top: 30px; color: #999; font-size: 0.9rem;">Default PIN: 1234</p>
+            </div>
+
+            <!-- Main Content -->
+            <div id="mainContent" class="main-content">
+                <h2 style="color: #dc3545; margin-bottom: 20px;">HR Data Upload</h2>
+                
+                <div class="message" id="hrMessage"></div>
+
+                <div class="upload-section">
+                    <h3 style="color: #dc3545; margin-bottom: 15px;">📄 Upload Employee Data</h3>
+                    <p style="color: #666; margin-bottom: 20px;">Upload an Excel file (.xls or .xlsx) containing employee leave and attendance data</p>
+                    
+                    <div class="file-input-wrapper">
+                        <input type="file" id="fileInput" class="file-input" accept=".xlsx, .xls" onchange="handleFileUpload(event)">
+                        <label for="fileInput" class="file-label">Choose Excel File</label>
+                    </div>
+
+                    <div class="file-info" id="fileInfo">
+                        <div class="file-name" id="fileName"></div>
+                        <button class="remove-btn" onclick="removeFile()">Remove File</button>
+                    </div>
+                </div>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 15px; color: #dc3545; font-weight: 600;">Processing data...</p>
+                </div>
+
+                <div id="dataPreview"></div>
+
+                <div class="nav-link">
+                    <a href="employee-portal.html">→ Go to Employee Portal</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const HR_PIN = '1234'; // Change this to your desired PIN
+        let uploadedFile = null;
+
+        function unlockPortal() {
+            const pin = document.getElementById('pinInput').value;
+            
+            if (pin === HR_PIN) {
+                document.getElementById('lockScreen').style.display = 'none';
+                document.getElementById('mainContent').classList.add('unlocked');
+                document.getElementById('logoutBtn').style.display = 'block';
+                document.getElementById('pinInput').value = '';
+            } else {
+                showMessage('lockMessage', '❌ Invalid PIN. Please try again.', 'error');
+            }
+        }
+
+        function logout() {
+            document.getElementById('lockScreen').style.display = 'block';
+            document.getElementById('mainContent').classList.remove('unlocked');
+            document.getElementById('logoutBtn').style.display = 'none';
+            document.getElementById('pinInput').value = '';
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const validTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 
+                               'application/vnd.ms-excel'];
+            if (!validTypes.includes(file.type) && !file.name.match(/\.(xlsx|xls)$/)) {
+                showMessage('hrMessage', 'Invalid file type. Please upload an Excel file (.xlsx or .xls)', 'error');
+                return;
+            }
+
+            uploadedFile = file;
+            document.getElementById('fileName').textContent = `📁 ${file.name}`;
+            document.getElementById('fileInfo').classList.add('show');
+            document.getElementById('loading').classList.add('show');
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+
+                    if (jsonData.length === 0) {
+                        throw new Error('Excel file is empty');
+                    }
+
+                    processEmployeeData(jsonData);
+                } catch (error) {
+                    document.getElementById('loading').classList.remove('show');
+                    showMessage('hrMessage', `Error parsing file: ${error.message}`, 'error');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function processEmployeeData(data) {
+            try {
+                const employees = data.map(row => {
+                    const lateEntries = row.late_entries 
+                        ? row.late_entries.toString().split(';').map(e => e.trim()).filter(e => e)
+                        : [];
+                    
+                    const totalLeaves = parseInt(row.total_annual_leaves) || 0;
+                    const leavesTaken = parseInt(row.leaves_taken) || 0;
+                    const leavesRemaining = totalLeaves - leavesTaken;
+
+                    return {
+                        employee_id: row.employee_id?.toString() || '',
+                        employee_pin: row.employee_pin?.toString() || '',
+                        total_annual_leaves: totalLeaves,
+                        sick_leaves: parseInt(row.sick_leaves) || 0,
+                        leaves_taken: leavesTaken,
+                        leaves_remaining: leavesRemaining,
+                        late_entries: lateEntries,
+                        late_deduction_rate: parseFloat(row.late_deduction_rate) || 0,
+                        total_late_deduction: parseFloat(row.total_late_deduction) || 0
+                    };
+                });
+
+                window.employeeData = { employees };
+
+                document.getElementById('loading').classList.remove('show');
+                showMessage('hrMessage', `✓ Successfully uploaded data for ${employees.length} employees`, 'success');
+                displayUploadedData(employees);
+            } catch (error) {
+                document.getElementById('loading').classList.remove('show');
+                showMessage('hrMessage', `Error processing data: ${error.message}`, 'error');
+            }
+        }
+
+        function displayUploadedData(employees) {
+            const preview = document.getElementById('dataPreview');
+            const displayCount = Math.min(5, employees.length);
+            
+            let html = `
+                <h3 style="color: #dc3545; margin: 30px 0 15px 0;">📊 Data Preview (First ${displayCount} rows)</h3>
+                <table class="preview-table">
+                    <thead>
+                        <tr>
+                            <th>Employee ID</th>
+                            <th>PIN Set</th>
+                            <th>Total Leaves</th>
+                            <th>Leaves Taken</th>
+                            <th>Remaining</th>
+                            <th>Late Days</th>
+                            <th>Deduction</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            employees.slice(0, displayCount).forEach(emp => {
+                html += `
+                    <tr>
+                        <td>${emp.employee_id}</td>
+                        <td>${emp.employee_pin ? '✓ Yes' : '✗ No'}</td>
+                        <td>${emp.total_annual_leaves}</td>
+                        <td>${emp.leaves_taken}</td>
+                        <td>${emp.leaves_remaining}</td>
+                        <td>${emp.late_entries.length}</td>
+                        <td>$${emp.total_late_deduction}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+                <p style="margin-top: 15px; color: #666; text-align: center;">
+                    Total employees: ${employees.length}
+                </p>
+            `;
+
+            preview.innerHTML = html;
+        }
+
+        function removeFile() {
+            uploadedFile = null;
+            document.getElementById('fileInput').value = '';
+            document.getElementById('fileInfo').classList.remove('show');
+            document.getElementById('dataPreview').innerHTML = '';
+            document.getElementById('hrMessage').classList.remove('show');
+            window.employeeData = null;
+        }
+
+        function showMessage(elementId, message, type) {
+            const messageEl = document.getElementById(elementId);
+            messageEl.textContent = message;
+            messageEl.className = `message ${type} show`;
+            setTimeout(() => {
+                messageEl.classList.remove('show');
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
