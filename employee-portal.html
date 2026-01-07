@@ -3,486 +3,426 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Portal - Leave Management</title>
+    <title>Employee Portal - Leave Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            min-height: 100vh;
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 30px;
             padding: 20px;
+            background: linear-gradient(90deg, #e8f6ef 0%, #f0f8ff 100%);
+            border-radius: var(--radius);
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            color: white;
+        
+        .employee-selector {
+            background-color: white;
+            padding: 25px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
             margin-bottom: 30px;
         }
-
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+        
+        .selector-container {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
         }
-
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
+        
+        .selector-container .form-group {
+            flex: 1;
         }
-
-        .portal-card {
-            background: white;
-            border-radius: 15px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        
+        .employee-dashboard {
+            display: none; /* Hidden until employee is selected */
         }
-
-        .login-screen {
-            text-align: center;
-            padding: 60px 20px;
-        }
-
-        .login-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-        }
-
-        .login-screen h2 {
-            color: #dc3545;
-            margin-bottom: 15px;
-            font-size: 1.8rem;
-        }
-
-        .login-screen p {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 1.1rem;
-        }
-
-        .login-form {
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: #dc3545;
-        }
-
-        .pin-input {
-            letter-spacing: 5px;
-            text-align: center;
-        }
-
-        .login-btn {
-            width: 100%;
+        
+        .late-entries-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 6px;
             padding: 15px;
-            background: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
+            margin-top: 15px;
         }
-
-        .login-btn:hover {
-            background: #c82333;
-            transform: translateY(-2px);
-        }
-
-        .main-content {
-            display: none;
-        }
-
-        .main-content.show {
-            display: block;
-        }
-
-        .message {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .message.show {
-            display: block;
-        }
-
-        .message.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .employee-header {
+        
+        .late-entry-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #e0e0e0;
         }
-
-        .employee-info h2 {
-            color: #dc3545;
-            font-size: 1.8rem;
+        
+        .late-entry-item:last-child {
+            border-bottom: none;
         }
-
-        .employee-info p {
-            color: #666;
-            margin-top: 5px;
-        }
-
-        .logout-btn {
-            padding: 10px 25px;
-            background: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .logout-btn:hover {
-            background: #c82333;
-        }
-
-        .detail-card {
-            background: #fff5f5;
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 20px;
-            border-left: 4px solid #dc3545;
-        }
-
-        .detail-card h3 {
-            color: #dc3545;
-            margin-bottom: 20px;
-            font-size: 1.3rem;
-        }
-
-        .detail-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-
-        .detail-item {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .detail-label {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 5px;
-        }
-
-        .detail-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #333;
-        }
-
-        .late-entries {
+        
+        .deduction-summary {
+            background-color: #fff3e0;
+            border-left: 5px solid #ff9800;
+            padding: 20px;
+            border-radius: var(--radius);
             margin-top: 20px;
         }
-
-        .late-entry {
-            background: white;
-            padding: 12px;
-            margin-bottom: 10px;
-            border-radius: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        }
-
-        .late-date {
-            font-weight: 600;
-            color: #333;
-        }
-
-        .late-time {
-            color: #dc3545;
-            font-weight: 600;
-        }
-
-        .nav-link {
-            text-align: center;
-            margin-top: 30px;
-            padding-top: 30px;
-            border-top: 2px solid #e0e0e0;
-        }
-
-        .nav-link a {
-            color: #dc3545;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s;
-        }
-
-        .nav-link a:hover {
-            color: #c82333;
-        }
-
+        
         @media (max-width: 768px) {
-            .portal-card {
-                padding: 20px;
-            }
-
-            .header h1 {
-                font-size: 1.8rem;
-            }
-
-            .detail-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .employee-header {
+            .selector-container {
                 flex-direction: column;
-                gap: 15px;
-                text-align: center;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>👤 Employee Portal</h1>
-            <p>View Your Leave Details</p>
+        <div class="nav-header">
+            <h1><i class="fas fa-user-tie"></i> Employee Portal - Leave & Attendance</h1>
+            <div class="nav-links">
+                <a href="index.html" class="btn"><i class="fas fa-home"></i> Home</a>
+                <a href="hr-portal.html" class="btn btn-primary"><i class="fas fa-users-cog"></i> HR Portal</a>
+            </div>
         </div>
-
-        <div class="portal-card">
-            <!-- Login Screen -->
-            <div id="loginScreen" class="login-screen">
-                <div class="login-icon">🔑</div>
-                <h2>Employee Login</h2>
-                <p>Enter your credentials to access your leave information</p>
+        
+        <div class="welcome-section">
+            <h2>Welcome to Employee Self-Service Portal</h2>
+            <p>View your leave balances, attendance records, and late deduction details. Data is loaded directly from the Excel file.</p>
+            <p><i class="fas fa-info-circle"></i> <strong>Note:</strong> This portal reads data from <code>employee_data.xlsx</code> in the same folder.</p>
+        </div>
+        
+        <div class="employee-selector">
+            <h3><i class="fas fa-search"></i> Select Your Employee ID</h3>
+            <p>Choose your employee ID from the dropdown or enter it manually to view your details.</p>
+            
+            <div class="selector-container">
+                <div class="form-group">
+                    <label for="employeeSelect">Select Employee</label>
+                    <select id="employeeSelect" class="form-control">
+                        <option value="">-- Select Employee --</option>
+                        <!-- Options will be populated by JavaScript -->
+                    </select>
+                </div>
                 
-                <div class="message" id="loginMessage"></div>
-
-                <form class="login-form" onsubmit="event.preventDefault(); loginEmployee();">
-                    <div class="form-group">
-                        <label for="employeeId">Employee ID</label>
-                        <input 
-                            type="text" 
-                            id="employeeId" 
-                            class="form-input" 
-                            placeholder="Enter your employee ID"
-                            required
-                        >
-                    </div>
-                    <div class="form-group">
-                        <label for="employeePin">PIN</label>
-                        <input 
-                            type="password" 
-                            id="employeePin" 
-                            class="form-input pin-input" 
-                            placeholder="••••"
-                            maxlength="4"
-                            required
-                        >
-                    </div>
-                    <button type="submit" class="login-btn">Login</button>
-                </form>
-
-                <div class="nav-link">
-                    <a href="hr-portal.html">← Back to HR Portal</a>
+                <div class="form-group">
+                    <label for="employeeIdInput">Or Enter Employee ID</label>
+                    <input type="text" id="employeeIdInput" class="form-control" placeholder="e.g., EMP001">
+                </div>
+                
+                <button id="viewDetailsBtn" class="btn btn-primary">
+                    <i class="fas fa-eye"></i> View My Details
+                </button>
+            </div>
+            
+            <div id="selectorMessage" style="margin-top: 15px;"></div>
+        </div>
+        
+        <div id="employeeDashboard" class="employee-dashboard">
+            <div class="card">
+                <div id="employeeInfo">
+                    <!-- Employee information will be loaded here -->
                 </div>
             </div>
-
-            <!-- Main Content -->
-            <div id="mainContent" class="main-content">
-                <div class="employee-header">
-                    <div class="employee-info">
-                        <h2>Welcome, <span id="employeeIdDisplay"></span></h2>
-                        <p>Your Leave Information</p>
-                    </div>
-                    <button class="logout-btn" onclick="logout()">Logout</button>
+            
+            <div class="leave-summary">
+                <!-- Leave summary cards will be loaded here -->
+            </div>
+            
+            <div class="card">
+                <h3><i class="fas fa-clock"></i> Late Attendance Details</h3>
+                <div id="lateAttendanceDetails">
+                    <!-- Late attendance details will be loaded here -->
                 </div>
-
-                <div class="detail-card">
-                    <h3>📋 Leave Summary</h3>
-                    <div class="detail-grid">
-                        <div class="detail-item">
-                            <div class="detail-label">Total Annual Leaves</div>
-                            <div class="detail-value" id="totalLeaves">-</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Sick Leaves</div>
-                            <div class="detail-value" id="sickLeaves">-</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Leaves Taken</div>
-                            <div class="detail-value" id="leavesTaken">-</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Leaves Remaining</div>
-                            <div class="detail-value" style="color: #28a745;" id="leavesRemaining">-</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="detail-card">
-                    <h3>⏰ Late Attendance Summary</h3>
-                    <div class="detail-grid">
-                        <div class="detail-item">
-                            <div class="detail-label">Total Late Days</div>
-                            <div class="detail-value" style="color: #dc3545;" id="lateDays">-</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Deduction Rate</div>
-                            <div class="detail-value" id="deductionRate">-</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Total Deduction</div>
-                            <div class="detail-value" style="color: #dc3545;" id="totalDeduction">-</div>
-                        </div>
-                    </div>
-
-                    <div class="late-entries" id="lateEntriesList"></div>
-                </div>
-
-                <div class="nav-link">
-                    <a href="hr-portal.html">← Back to HR Portal</a>
+                
+                <div class="deduction-summary" id="deductionSummary">
+                    <!-- Late deduction summary will be loaded here -->
                 </div>
             </div>
+            
+            <div class="card">
+                <h3><i class="fas fa-calendar-alt"></i> Quick Leave Balance</h3>
+                <p>This is a summary of your current leave status as recorded in the system.</p>
+                
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 20px;">
+                    <div style="text-align: center; padding: 15px; background-color: #e8f6ef; border-radius: 8px;">
+                        <div style="font-size: 2rem; font-weight: bold; color: #2c8c3d;" id="quickRemaining">0</div>
+                        <div style="color: #555;">Leaves Remaining</div>
+                    </div>
+                    
+                    <div style="text-align: center; padding: 15px; background-color: #fff3e0; border-radius: 8px;">
+                        <div style="font-size: 2rem; font-weight: bold; color: #ff9800;" id="quickLateDays">0</div>
+                        <div style="color: #555;">Late Days This Year</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card" id="dataSourceInfo">
+            <h3><i class="fas fa-database"></i> Data Source Information</h3>
+            <p>The system is currently reading employee data from: <strong id="dataSource">Loading...</strong></p>
+            <p>Last updated: <span id="lastUpdated">--</span></p>
+            <button id="refreshDataBtn" class="btn">
+                <i class="fas fa-sync"></i> Refresh Data from Excel File
+            </button>
+        </div>
+        
+        <div class="footer">
+            <p>Employee Portal - Leave Management System &copy; 2023 | <a href="index.html">Return to Home</a></p>
         </div>
     </div>
 
+    <script src="script.js"></script>
     <script>
+        // Employee Portal specific JavaScript
+        let currentEmployees = [];
         let currentEmployee = null;
-
-        function loginEmployee() {
-            const employeeId = document.getElementById('employeeId').value.trim();
-            const employeePin = document.getElementById('employeePin').value.trim();
-
-            if (!employeeId || !employeePin) {
-                showMessage('loginMessage', 'Please enter both Employee ID and PIN', 'error');
-                return;
-            }
-
-            // Check if employee data exists
-            if (!window.employeeData || !window.employeeData.employees) {
-                showMessage('loginMessage', 'No employee data found. Please contact HR.', 'error');
-                return;
-            }
-
-            // Find employee
-            const employee = window.employeeData.employees.find(e => 
-                e.employee_id === employeeId && e.employee_pin === employeePin
-            );
-
-            if (employee) {
-                currentEmployee = employee;
-                showEmployeeDetails(employee);
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('mainContent').classList.add('show');
-                document.getElementById('employeeId').value = '';
-                document.getElementById('employeePin').value = '';
-            } else {
-                showMessage('loginMessage', '❌ Invalid Employee ID or PIN', 'error');
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Load employee data
+            await loadEmployeeData();
+            
+            // Setup event listeners
+            document.getElementById('viewDetailsBtn').addEventListener('click', viewEmployeeDetails);
+            document.getElementById('employeeSelect').addEventListener('change', function() {
+                if (this.value) {
+                    document.getElementById('employeeIdInput').value = this.value;
+                    viewEmployeeDetails();
+                }
+            });
+            
+            document.getElementById('employeeIdInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    viewEmployeeDetails();
+                }
+            });
+            
+            document.getElementById('refreshDataBtn').addEventListener('click', async function() {
+                await loadEmployeeData(true);
+                showMessage('Data refreshed from Excel file!', 'success');
+                
+                // If an employee was already selected, refresh their details
+                if (currentEmployee) {
+                    const employeeId = currentEmployee.employee_id;
+                    currentEmployee = findEmployeeById(currentEmployees, employeeId);
+                    if (currentEmployee) {
+                        displayEmployeeDetails(currentEmployee);
+                    }
+                }
+            });
+        });
+        
+        // Load employee data from Excel file
+        async function loadEmployeeData(forceRefresh = false) {
+            try {
+                showLoader(true);
+                
+                // Clear any cached data if force refresh
+                if (forceRefresh) {
+                    localStorage.removeItem('hr_employee_data');
+                }
+                
+                // Try to read from Excel file first
+                let employees = await readExcelFile('employee_data.xlsx');
+                let dataSource = 'employee_data.xlsx';
+                
+                if (!employees || employees.length === 0) {
+                    // Try sample data
+                    employees = await readExcelFile('sample_data.xlsx');
+                    dataSource = 'sample_data.xlsx';
+                    
+                    if (!employees || employees.length === 0) {
+                        // Fallback to localStorage
+                        employees = loadFromLocalStorage('hr_employee_data');
+                        dataSource = 'localStorage';
+                        
+                        if (!employees || employees.length === 0) {
+                            // Finally, use sample data from script
+                            employees = sampleEmployees;
+                            dataSource = 'sample data';
+                        }
+                    }
+                }
+                
+                currentEmployees = employees;
+                
+                // Update data source info
+                document.getElementById('dataSource').textContent = dataSource;
+                document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+                
+                // Populate employee dropdown
+                populateEmployeeDropdown(employees, 'employeeSelect');
+                
+                showLoader(false);
+                return true;
+                
+            } catch (error) {
+                console.error('Error loading employee data:', error);
+                showLoader(false);
+                
+                // Try to load from localStorage as fallback
+                const employees = loadFromLocalStorage('hr_employee_data') || sampleEmployees;
+                currentEmployees = employees;
+                
+                populateEmployeeDropdown(employees, 'employeeSelect');
+                
+                document.getElementById('dataSource').textContent = 'localStorage (fallback)';
+                document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+                
+                showMessage('Using cached data. Could not read Excel file directly.', 'error');
+                return false;
             }
         }
-
-        function showEmployeeDetails(employee) {
-            document.getElementById('employeeIdDisplay').textContent = employee.employee_id;
-            document.getElementById('totalLeaves').textContent = employee.total_annual_leaves;
-            document.getElementById('sickLeaves').textContent = employee.sick_leaves;
-            document.getElementById('leavesTaken').textContent = employee.leaves_taken;
-            document.getElementById('leavesRemaining').textContent = employee.leaves_remaining;
-            document.getElementById('lateDays').textContent = employee.late_entries.length;
-            document.getElementById('deductionRate').textContent = `$${employee.late_deduction_rate}`;
-            document.getElementById('totalDeduction').textContent = `$${employee.total_late_deduction}`;
-
-            // Display late entries
-            const lateEntriesList = document.getElementById('lateEntriesList');
-            if (employee.late_entries.length > 0) {
-                let lateHtml = '<h4 style="color: #dc3545; margin: 20px 0 15px 0;">Late Entry Records</h4>';
+        
+        // View employee details
+        function viewEmployeeDetails() {
+            const select = document.getElementById('employeeSelect');
+            const input = document.getElementById('employeeIdInput');
+            
+            let employeeId = input.value.trim();
+            if (!employeeId && select.value) {
+                employeeId = select.value;
+                input.value = employeeId;
+            }
+            
+            if (!employeeId) {
+                showMessage('Please select or enter an Employee ID.', 'error');
+                return;
+            }
+            
+            // Find employee
+            currentEmployee = findEmployeeById(currentEmployees, employeeId);
+            
+            if (!currentEmployee) {
+                showMessage(`Employee with ID "${employeeId}" not found.`, 'error');
+                document.getElementById('employeeDashboard').style.display = 'none';
+                return;
+            }
+            
+            // Show dashboard
+            document.getElementById('employeeDashboard').style.display = 'block';
+            
+            // Display employee details
+            displayEmployeeDetails(currentEmployee);
+            
+            // Update quick view
+            document.getElementById('quickRemaining').textContent = currentEmployee.leaves_remaining;
+            document.getElementById('quickLateDays').textContent = currentEmployee.late_entries ? currentEmployee.late_entries.length : 0;
+            
+            // Show success message
+            showMessage(`Loaded details for ${currentEmployee.name} (${currentEmployee.employee_id})`, 'success');
+        }
+        
+        // Custom display function for employee details
+        function displayEmployeeDetails(employee) {
+            const container = document.getElementById('employeeInfo');
+            const lateContainer = document.getElementById('lateAttendanceDetails');
+            const deductionContainer = document.getElementById('deductionSummary');
+            
+            if (!container || !lateContainer || !deductionContainer) return;
+            
+            // Basic employee info
+            container.innerHTML = `
+                <h2>${employee.name} <small>(${employee.employee_id})</small></h2>
+                <p><strong>Department:</strong> ${employee.department || 'Not specified'}</p>
+                <p><strong>Employment Status:</strong> Active</p>
+            `;
+            
+            // Update leave summary section
+            const summaryContainer = document.querySelector('.leave-summary');
+            summaryContainer.innerHTML = `
+                <div class="summary-card">
+                    <h3>Total Annual Leaves</h3>
+                    <div class="summary-value">${employee.total_annual_leaves}</div>
+                    <div class="summary-unit">days per year</div>
+                </div>
+                
+                <div class="summary-card green">
+                    <h3>Sick Leaves Available</h3>
+                    <div class="summary-value">${employee.sick_leaves}</div>
+                    <div class="summary-unit">days available</div>
+                </div>
+                
+                <div class="summary-card orange">
+                    <h3>Leaves Taken</h3>
+                    <div class="summary-value">${employee.leaves_taken}</div>
+                    <div class="summary-unit">days used</div>
+                </div>
+                
+                <div class="summary-card red">
+                    <h3>Leaves Remaining</h3>
+                    <div class="summary-value">${employee.leaves_remaining}</div>
+                    <div class="summary-unit">days remaining</div>
+                </div>
+            `;
+            
+            // Late attendance details
+            const lateDays = employee.late_entries ? employee.late_entries.length : 0;
+            
+            let lateEntriesHtml = '';
+            if (lateDays > 0) {
+                lateEntriesHtml = '<div class="late-entries-list">';
                 employee.late_entries.forEach(entry => {
-                    const [date, time] = entry.split(' ');
-                    lateHtml += `
-                        <div class="late-entry">
-                            <span class="late-date">📅 ${date}</span>
-                            <span class="late-time">🕐 ${time}</span>
+                    lateEntriesHtml += `
+                        <div class="late-entry-item">
+                            <span>${entry}</span>
+                            <span><strong>Deduction:</strong> $${employee.late_deduction_rate.toFixed(2)}</span>
                         </div>
                     `;
                 });
-                lateEntriesList.innerHTML = lateHtml;
+                lateEntriesHtml += '</div>';
             } else {
-                lateEntriesList.innerHTML = '<p style="color: #28a745; text-align: center; margin-top: 20px;">✓ No late entries recorded</p>';
+                lateEntriesHtml = '<p>No late entries recorded.</p>';
             }
+            
+            lateContainer.innerHTML = `
+                <p><strong>Total Late Days:</strong> ${lateDays}</p>
+                <p><strong>Late Deduction Rate:</strong> $${employee.late_deduction_rate.toFixed(2)} per day</p>
+                <h4 style="margin-top: 15px;">Late Entry Records:</h4>
+                ${lateEntriesHtml}
+            `;
+            
+            // Deduction summary
+            deductionContainer.innerHTML = `
+                <h4><i class="fas fa-calculator"></i> Late Deduction Summary</h4>
+                <p><strong>Total Late Days:</strong> ${lateDays}</p>
+                <p><strong>Rate per Day:</strong> $${employee.late_deduction_rate.toFixed(2)}</p>
+                <p><strong>Total Deduction Amount:</strong> $${employee.total_late_deduction.toFixed(2)}</p>
+                ${lateDays > 0 ? `<p><small>Calculation: ${lateDays} days × $${employee.late_deduction_rate.toFixed(2)} = $${employee.total_late_deduction.toFixed(2)}</small></p>` : ''}
+            `;
         }
-
-        function logout() {
-            currentEmployee = null;
-            document.getElementById('loginScreen').style.display = 'block';
-            document.getElementById('mainContent').classList.remove('show');
-            document.getElementById('employeeId').value = '';
-            document.getElementById('employeePin').value = '';
-        }
-
-        function showMessage(elementId, message, type) {
-            const messageEl = document.getElementById(elementId);
-            messageEl.textContent = message;
-            messageEl.className = `message ${type} show`;
+        
+        // Show message to user
+        function showMessage(message, type = 'info') {
+            const messageDiv = document.getElementById('selectorMessage');
+            messageDiv.innerHTML = `
+                <div style="padding: 12px; border-radius: 6px; 
+                           background-color: ${type === 'error' ? '#ffebee' : type === 'success' ? '#e8f6ef' : '#e8f4fd'};
+                           border-left: 5px solid ${type === 'error' ? '#f44336' : type === 'success' ? '#4CAF50' : '#2a5298'};
+                           color: ${type === 'error' ? '#c62828' : type === 'success' ? '#2c8c3d' : '#1e3c72'}">
+                    <strong>${type === 'error' ? 'Error:' : type === 'success' ? 'Success:' : 'Info:'}</strong> ${message}
+                </div>
+            `;
+            
+            // Auto-hide message after 5 seconds
             setTimeout(() => {
-                messageEl.classList.remove('show');
+                messageDiv.innerHTML = '';
             }, 5000);
         }
-
-        // Check if data exists on page load
-        window.addEventListener('load', () => {
-            if (!window.employeeData || !window.employeeData.employees) {
-                showMessage('loginMessage', 'ℹ️ No employee data loaded. Please ask HR to upload data first.', 'error');
+        
+        // Show/hide loader
+        function showLoader(show) {
+            const viewBtn = document.getElementById('viewDetailsBtn');
+            const refreshBtn = document.getElementById('refreshDataBtn');
+            
+            if (show) {
+                viewBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                viewBtn.disabled = true;
+                refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                refreshBtn.disabled = true;
+            } else {
+                viewBtn.innerHTML = '<i class="fas fa-eye"></i> View My Details';
+                viewBtn.disabled = false;
+                refreshBtn.innerHTML = '<i class="fas fa-sync"></i> Refresh Data from Excel File';
+                refreshBtn.disabled = false;
             }
-        });
+        }
     </script>
 </body>
 </html>
