@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Portal - Leave Management</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -46,9 +47,133 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
 
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 10px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-number {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .step-number.active {
+            background: #dc3545;
+            color: white;
+        }
+
+        .step-number.completed {
+            background: #28a745;
+            color: white;
+        }
+
+        .step-text {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .step-text.active {
+            color: #dc3545;
+        }
+
+        .step-arrow {
+            color: #ccc;
+            font-size: 1.2rem;
+        }
+
+        .upload-section {
+            border: 3px dashed #dc3545;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            background: #fff5f5;
+            margin-bottom: 30px;
+            transition: all 0.3s;
+        }
+
+        .upload-section:hover {
+            background: #ffe6e6;
+            border-color: #c82333;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            display: inline-block;
+            padding: 15px 40px;
+            background: #dc3545;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .file-label:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .file-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .file-info.show {
+            display: block;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .data-status {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #28a745;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
         .login-screen {
             text-align: center;
-            padding: 60px 20px;
+            padding: 40px 20px;
+            display: none;
+        }
+
+        .login-screen.show {
+            display: block;
         }
 
         .login-icon {
@@ -151,6 +276,12 @@
             background: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
+        }
+
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
         }
 
         .employee-header {
@@ -270,6 +401,31 @@
             color: #c82333;
         }
 
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #dc3545;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         @media (max-width: 768px) {
             .portal-card {
                 padding: 20px;
@@ -288,6 +444,15 @@
                 gap: 15px;
                 text-align: center;
             }
+
+            .step-indicator {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .step-arrow {
+                transform: rotate(90deg);
+            }
         }
     </style>
 </head>
@@ -299,6 +464,47 @@
         </div>
 
         <div class="portal-card">
+            <!-- Step Indicator -->
+            <div class="step-indicator" id="stepIndicator">
+                <div class="step">
+                    <div class="step-number active" id="step1">1</div>
+                    <div class="step-text active">Load Data</div>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step">
+                    <div class="step-number" id="step2">2</div>
+                    <div class="step-text">Login</div>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step">
+                    <div class="step-number" id="step3">3</div>
+                    <div class="step-text">View Details</div>
+                </div>
+            </div>
+
+            <div class="message" id="uploadMessage"></div>
+
+            <!-- Upload Section -->
+            <div id="uploadSection" class="upload-section">
+                <h3 style="color: #dc3545; margin-bottom: 15px;">📄 Load Employee Data</h3>
+                <p style="color: #666; margin-bottom: 20px;">Upload the Excel file containing employee leave data to continue</p>
+                
+                <div class="file-input-wrapper">
+                    <input type="file" id="fileInput" class="file-input" accept=".xlsx, .xls" onchange="handleFileUpload(event)">
+                    <label for="fileInput" class="file-label">Choose Excel File</label>
+                </div>
+
+                <div class="file-info" id="fileInfo">
+                    <div class="file-name" id="fileName"></div>
+                    <div class="data-status" id="dataStatus"></div>
+                </div>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 15px; color: #dc3545; font-weight: 600;">Loading employee data...</p>
+            </div>
+
             <!-- Login Screen -->
             <div id="loginScreen" class="login-screen">
                 <div class="login-icon">🔑</div>
@@ -331,10 +537,6 @@
                     </div>
                     <button type="submit" class="login-btn">Login</button>
                 </form>
-
-                <div class="nav-link">
-                    <a href="hr-portal.html">← Back to HR Portal</a>
-                </div>
             </div>
 
             <!-- Main Content -->
@@ -388,16 +590,111 @@
 
                     <div class="late-entries" id="lateEntriesList"></div>
                 </div>
+            </div>
 
-                <div class="nav-link">
-                    <a href="hr-portal.html">← Back to HR Portal</a>
-                </div>
+            <div class="nav-link">
+                <a href="index.html">← Back to Home</a>
             </div>
         </div>
     </div>
 
     <script>
+        let employeeData = null;
         let currentEmployee = null;
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const validTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 
+                               'application/vnd.ms-excel'];
+            if (!validTypes.includes(file.type) && !file.name.match(/\.(xlsx|xls)$/)) {
+                showMessage('uploadMessage', 'Invalid file type. Please upload an Excel file (.xlsx or .xls)', 'error');
+                return;
+            }
+
+            document.getElementById('fileName').textContent = `📁 ${file.name}`;
+            document.getElementById('fileInfo').classList.add('show');
+            document.getElementById('loading').classList.add('show');
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+
+                    if (jsonData.length === 0) {
+                        throw new Error('Excel file is empty');
+                    }
+
+                    processEmployeeData(jsonData);
+                } catch (error) {
+                    document.getElementById('loading').classList.remove('show');
+                    showMessage('uploadMessage', `Error parsing file: ${error.message}`, 'error');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function processEmployeeData(data) {
+            try {
+                const employees = data.map(row => {
+                    const lateEntries = row.late_entries 
+                        ? row.late_entries.toString().split(';').map(e => e.trim()).filter(e => e)
+                        : [];
+                    
+                    const totalLeaves = parseInt(row.total_annual_leaves) || 0;
+                    const leavesTaken = parseInt(row.leaves_taken) || 0;
+                    const leavesRemaining = totalLeaves - leavesTaken;
+
+                    return {
+                        employee_id: row.employee_id?.toString() || '',
+                        employee_pin: row.employee_pin?.toString() || '',
+                        total_annual_leaves: totalLeaves,
+                        sick_leaves: parseInt(row.sick_leaves) || 0,
+                        leaves_taken: leavesTaken,
+                        leaves_remaining: leavesRemaining,
+                        late_entries: lateEntries,
+                        late_deduction_rate: parseFloat(row.late_deduction_rate) || 0,
+                        total_late_deduction: parseFloat(row.total_late_deduction) || 0
+                    };
+                });
+
+                employeeData = { employees };
+
+                document.getElementById('loading').classList.remove('show');
+                document.getElementById('dataStatus').textContent = `✓ ${employees.length} employees loaded`;
+                
+                showMessage('uploadMessage', `✓ Successfully loaded data for ${employees.length} employees. Please proceed to login.`, 'success');
+                
+                // Update steps
+                updateStep(1, 'completed');
+                updateStep(2, 'active');
+                
+                // Show login screen
+                setTimeout(() => {
+                    document.getElementById('loginScreen').classList.add('show');
+                    document.getElementById('uploadSection').style.display = 'none';
+                }, 1500);
+
+            } catch (error) {
+                document.getElementById('loading').classList.remove('show');
+                showMessage('uploadMessage', `Error processing data: ${error.message}`, 'error');
+            }
+        }
+
+        function updateStep(stepNum, status) {
+            const stepElement = document.getElementById(`step${stepNum}`);
+            const stepTexts = document.querySelectorAll('.step-text');
+            
+            stepElement.className = `step-number ${status}`;
+            
+            if (status === 'active') {
+                stepTexts[stepNum - 1].classList.add('active');
+            }
+        }
 
         function loginEmployee() {
             const employeeId = document.getElementById('employeeId').value.trim();
@@ -408,24 +705,26 @@
                 return;
             }
 
-            // Check if employee data exists
-            if (!window.employeeData || !window.employeeData.employees) {
-                showMessage('loginMessage', 'No employee data found. Please contact HR.', 'error');
+            if (!employeeData || !employeeData.employees) {
+                showMessage('loginMessage', 'No employee data loaded. Please upload data first.', 'error');
                 return;
             }
 
-            // Find employee
-            const employee = window.employeeData.employees.find(e => 
+            const employee = employeeData.employees.find(e => 
                 e.employee_id === employeeId && e.employee_pin === employeePin
             );
 
             if (employee) {
                 currentEmployee = employee;
                 showEmployeeDetails(employee);
-                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('loginScreen').classList.remove('show');
                 document.getElementById('mainContent').classList.add('show');
+                document.getElementById('stepIndicator').style.display = 'none';
                 document.getElementById('employeeId').value = '';
                 document.getElementById('employeePin').value = '';
+                
+                updateStep(2, 'completed');
+                updateStep(3, 'active');
             } else {
                 showMessage('loginMessage', '❌ Invalid Employee ID or PIN', 'error');
             }
@@ -441,7 +740,6 @@
             document.getElementById('deductionRate').textContent = `$${employee.late_deduction_rate}`;
             document.getElementById('totalDeduction').textContent = `$${employee.total_late_deduction}`;
 
-            // Display late entries
             const lateEntriesList = document.getElementById('lateEntriesList');
             if (employee.late_entries.length > 0) {
                 let lateHtml = '<h4 style="color: #dc3545; margin: 20px 0 15px 0;">Late Entry Records</h4>';
@@ -462,10 +760,24 @@
 
         function logout() {
             currentEmployee = null;
-            document.getElementById('loginScreen').style.display = 'block';
+            employeeData = null;
+            document.getElementById('loginScreen').classList.remove('show');
             document.getElementById('mainContent').classList.remove('show');
+            document.getElementById('uploadSection').style.display = 'block';
+            document.getElementById('stepIndicator').style.display = 'flex';
+            document.getElementById('fileInput').value = '';
+            document.getElementById('fileInfo').classList.remove('show');
             document.getElementById('employeeId').value = '';
             document.getElementById('employeePin').value = '';
+            
+            // Reset steps
+            updateStep(1, 'active');
+            document.getElementById('step2').className = 'step-number';
+            document.getElementById('step3').className = 'step-number';
+            document.querySelectorAll('.step-text').forEach((text, i) => {
+                text.classList.remove('active');
+                if (i === 0) text.classList.add('active');
+            });
         }
 
         function showMessage(elementId, message, type) {
@@ -476,13 +788,6 @@
                 messageEl.classList.remove('show');
             }, 5000);
         }
-
-        // Check if data exists on page load
-        window.addEventListener('load', () => {
-            if (!window.employeeData || !window.employeeData.employees) {
-                showMessage('loginMessage', 'ℹ️ No employee data loaded. Please ask HR to upload data first.', 'error');
-            }
-        });
     </script>
 </body>
 </html>
