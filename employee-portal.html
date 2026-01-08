@@ -471,7 +471,7 @@
             </div>
 
             <div class="nav-link">
-                <a href="employee-portal.html">← Back to Home</a>
+                <a href="index.html">← Back to Home</a>
             </div>
         </div>
     </div>
@@ -638,8 +638,8 @@
             document.getElementById('leavesTaken').textContent = employee.leaves_taken;
             document.getElementById('leavesRemaining').textContent = employee.leaves_remaining;
             document.getElementById('lateDays').textContent = employee.late_entries.length;
-            document.getElementById('deductionRate').textContent = `$${employee.late_deduction_rate}`;
-            document.getElementById('totalDeduction').textContent = `$${employee.total_deduction}`;
+            document.getElementById('deductionRate').textContent = `Rs. ${employee.late_deduction_rate}`;
+            document.getElementById('totalDeduction').textContent = `Rs. ${employee.total_late_deduction}`;
 
             const lateEntriesList = document.getElementById('lateEntriesList');
             if (employee.late_entries.length > 0) {
