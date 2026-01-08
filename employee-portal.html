@@ -47,133 +47,9 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
 
-        .step-indicator {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 30px;
-            gap: 10px;
-        }
-
-        .step {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .step-number {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: #e0e0e0;
-            color: #666;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-        }
-
-        .step-number.active {
-            background: #dc3545;
-            color: white;
-        }
-
-        .step-number.completed {
-            background: #28a745;
-            color: white;
-        }
-
-        .step-text {
-            font-weight: 600;
-            color: #666;
-        }
-
-        .step-text.active {
-            color: #dc3545;
-        }
-
-        .step-arrow {
-            color: #ccc;
-            font-size: 1.2rem;
-        }
-
-        .upload-section {
-            border: 3px dashed #dc3545;
-            border-radius: 10px;
-            padding: 40px;
-            text-align: center;
-            background: #fff5f5;
-            margin-bottom: 30px;
-            transition: all 0.3s;
-        }
-
-        .upload-section:hover {
-            background: #ffe6e6;
-            border-color: #c82333;
-        }
-
-        .file-input-wrapper {
-            position: relative;
-            display: inline-block;
-        }
-
-        .file-input {
-            display: none;
-        }
-
-        .file-label {
-            display: inline-block;
-            padding: 15px 40px;
-            background: #dc3545;
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .file-label:hover {
-            background: #c82333;
-            transform: translateY(-2px);
-        }
-
-        .file-info {
-            margin-top: 20px;
-            padding: 15px;
-            background: white;
-            border-radius: 8px;
-            display: none;
-        }
-
-        .file-info.show {
-            display: block;
-        }
-
-        .file-name {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .data-status {
-            display: inline-block;
-            padding: 8px 15px;
-            background: #28a745;
-            color: white;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-top: 10px;
-        }
-
         .login-screen {
             text-align: center;
-            padding: 40px 20px;
-            display: none;
-        }
-
-        .login-screen.show {
-            display: block;
+            padding: 60px 20px;
         }
 
         .login-icon {
@@ -278,10 +154,10 @@
             border: 1px solid #f5c6cb;
         }
 
-        .message.info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
+        .message.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
         }
 
         .employee-header {
@@ -426,6 +302,46 @@
             100% { transform: rotate(360deg); }
         }
 
+        .file-upload-helper {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .file-upload-helper h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .file-upload-helper p {
+            color: #856404;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .manual-upload-btn {
+            display: inline-block;
+            padding: 10px 30px;
+            background: #ffc107;
+            color: #333;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .manual-upload-btn:hover {
+            background: #e0a800;
+        }
+
+        .file-input {
+            display: none;
+        }
+
         @media (max-width: 768px) {
             .portal-card {
                 padding: 20px;
@@ -444,15 +360,6 @@
                 gap: 15px;
                 text-align: center;
             }
-
-            .step-indicator {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .step-arrow {
-                transform: rotate(90deg);
-            }
         }
     </style>
 </head>
@@ -464,43 +371,7 @@
         </div>
 
         <div class="portal-card">
-            <!-- Step Indicator -->
-            <div class="step-indicator" id="stepIndicator">
-                <div class="step">
-                    <div class="step-number active" id="step1">1</div>
-                    <div class="step-text active">Load Data</div>
-                </div>
-                <div class="step-arrow">→</div>
-                <div class="step">
-                    <div class="step-number" id="step2">2</div>
-                    <div class="step-text">Login</div>
-                </div>
-                <div class="step-arrow">→</div>
-                <div class="step">
-                    <div class="step-number" id="step3">3</div>
-                    <div class="step-text">View Details</div>
-                </div>
-            </div>
-
-            <div class="message" id="uploadMessage"></div>
-
-            <!-- Upload Section -->
-            <div id="uploadSection" class="upload-section">
-                <h3 style="color: #dc3545; margin-bottom: 15px;">📄 Load Employee Data</h3>
-                <p style="color: #666; margin-bottom: 20px;">Upload the Excel file containing employee leave data to continue</p>
-                
-                <div class="file-input-wrapper">
-                    <input type="file" id="fileInput" class="file-input" accept=".xlsx, .xls" onchange="handleFileUpload(event)">
-                    <label for="fileInput" class="file-label">Choose Excel File</label>
-                </div>
-
-                <div class="file-info" id="fileInfo">
-                    <div class="file-name" id="fileName"></div>
-                    <div class="data-status" id="dataStatus"></div>
-                </div>
-            </div>
-
-            <div class="loading" id="loading">
+            <div class="loading" id="initialLoading">
                 <div class="spinner"></div>
                 <p style="margin-top: 15px; color: #dc3545; font-weight: 600;">Loading employee data...</p>
             </div>
@@ -537,6 +408,13 @@
                     </div>
                     <button type="submit" class="login-btn">Login</button>
                 </form>
+
+                <div class="file-upload-helper" id="uploadHelper" style="display: none;">
+                    <h4>⚠️ Data File Not Found</h4>
+                    <p>Please ensure "employee_leave_records.xlsx" is in the same folder, or upload manually:</p>
+                    <input type="file" id="manualFileInput" class="file-input" accept=".xlsx, .xls" onchange="handleManualUpload(event)">
+                    <label for="manualFileInput" class="manual-upload-btn">Upload Excel File</label>
+                </div>
             </div>
 
             <!-- Main Content -->
@@ -602,20 +480,71 @@
         let employeeData = null;
         let currentEmployee = null;
 
-        function handleFileUpload(event) {
+        // List of possible file names to look for
+        const possibleFileNames = [
+            'employee_leave_records.xlsx',
+            'employee_leave_records.xls',
+            'employee-leave-records.xlsx',
+            'employee-leave-records.xls',
+            'leave_records.xlsx',
+            'leave_records.xls',
+            'employee_data.xlsx',
+            'employee_data.xls'
+        ];
+
+        // Try to load data file automatically on page load
+        window.addEventListener('load', async () => {
+            document.getElementById('initialLoading').classList.add('show');
+            
+            let dataLoaded = false;
+            
+            // Try to load from each possible filename
+            for (const fileName of possibleFileNames) {
+                try {
+                    const response = await fetch(fileName);
+                    if (response.ok) {
+                        const arrayBuffer = await response.arrayBuffer();
+                        const data = new Uint8Array(arrayBuffer);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                        
+                        if (jsonData.length > 0) {
+                            processEmployeeData(jsonData);
+                            dataLoaded = true;
+                            console.log(`Successfully loaded data from: ${fileName}`);
+                            break;
+                        }
+                    }
+                } catch (error) {
+                    // File not found, continue to next filename
+                    continue;
+                }
+            }
+            
+            document.getElementById('initialLoading').classList.remove('show');
+            
+            if (!dataLoaded) {
+                document.getElementById('loginScreen').style.display = 'block';
+                document.getElementById('uploadHelper').style.display = 'block';
+                showMessage('loginMessage', 
+                    '⚠️ Employee data file not found. Please upload the file manually or contact HR.', 
+                    'warning');
+            } else {
+                document.getElementById('loginScreen').style.display = 'block';
+            }
+        });
+
+        function handleManualUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
 
             const validTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 
                                'application/vnd.ms-excel'];
             if (!validTypes.includes(file.type) && !file.name.match(/\.(xlsx|xls)$/)) {
-                showMessage('uploadMessage', 'Invalid file type. Please upload an Excel file (.xlsx or .xls)', 'error');
+                showMessage('loginMessage', 'Invalid file type. Please upload an Excel file (.xlsx or .xls)', 'error');
                 return;
             }
-
-            document.getElementById('fileName').textContent = `📁 ${file.name}`;
-            document.getElementById('fileInfo').classList.add('show');
-            document.getElementById('loading').classList.add('show');
 
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -630,9 +559,10 @@
                     }
 
                     processEmployeeData(jsonData);
+                    document.getElementById('uploadHelper').style.display = 'none';
+                    showMessage('loginMessage', '✓ Data loaded successfully! Please login.', 'success');
                 } catch (error) {
-                    document.getElementById('loading').classList.remove('show');
-                    showMessage('uploadMessage', `Error parsing file: ${error.message}`, 'error');
+                    showMessage('loginMessage', `Error parsing file: ${error.message}`, 'error');
                 }
             };
             reader.readAsArrayBuffer(file);
@@ -663,36 +593,10 @@
                 });
 
                 employeeData = { employees };
-
-                document.getElementById('loading').classList.remove('show');
-                document.getElementById('dataStatus').textContent = `✓ ${employees.length} employees loaded`;
-                
-                showMessage('uploadMessage', `✓ Successfully loaded data for ${employees.length} employees. Please proceed to login.`, 'success');
-                
-                // Update steps
-                updateStep(1, 'completed');
-                updateStep(2, 'active');
-                
-                // Show login screen
-                setTimeout(() => {
-                    document.getElementById('loginScreen').classList.add('show');
-                    document.getElementById('uploadSection').style.display = 'none';
-                }, 1500);
-
+                console.log(`Processed ${employees.length} employee records`);
             } catch (error) {
-                document.getElementById('loading').classList.remove('show');
-                showMessage('uploadMessage', `Error processing data: ${error.message}`, 'error');
-            }
-        }
-
-        function updateStep(stepNum, status) {
-            const stepElement = document.getElementById(`step${stepNum}`);
-            const stepTexts = document.querySelectorAll('.step-text');
-            
-            stepElement.className = `step-number ${status}`;
-            
-            if (status === 'active') {
-                stepTexts[stepNum - 1].classList.add('active');
+                console.error('Error processing employee data:', error);
+                showMessage('loginMessage', `Error processing data: ${error.message}`, 'error');
             }
         }
 
@@ -706,7 +610,8 @@
             }
 
             if (!employeeData || !employeeData.employees) {
-                showMessage('loginMessage', 'No employee data loaded. Please upload data first.', 'error');
+                showMessage('loginMessage', 'No employee data loaded. Please upload data file.', 'error');
+                document.getElementById('uploadHelper').style.display = 'block';
                 return;
             }
 
@@ -717,14 +622,10 @@
             if (employee) {
                 currentEmployee = employee;
                 showEmployeeDetails(employee);
-                document.getElementById('loginScreen').classList.remove('show');
+                document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('mainContent').classList.add('show');
-                document.getElementById('stepIndicator').style.display = 'none';
                 document.getElementById('employeeId').value = '';
                 document.getElementById('employeePin').value = '';
-                
-                updateStep(2, 'completed');
-                updateStep(3, 'active');
             } else {
                 showMessage('loginMessage', '❌ Invalid Employee ID or PIN', 'error');
             }
@@ -738,7 +639,7 @@
             document.getElementById('leavesRemaining').textContent = employee.leaves_remaining;
             document.getElementById('lateDays').textContent = employee.late_entries.length;
             document.getElementById('deductionRate').textContent = `$${employee.late_deduction_rate}`;
-            document.getElementById('totalDeduction').textContent = `$${employee.total_late_deduction}`;
+            document.getElementById('totalDeduction').textContent = `$${employee.total_deduction}`;
 
             const lateEntriesList = document.getElementById('lateEntriesList');
             if (employee.late_entries.length > 0) {
@@ -760,24 +661,10 @@
 
         function logout() {
             currentEmployee = null;
-            employeeData = null;
-            document.getElementById('loginScreen').classList.remove('show');
+            document.getElementById('loginScreen').style.display = 'block';
             document.getElementById('mainContent').classList.remove('show');
-            document.getElementById('uploadSection').style.display = 'block';
-            document.getElementById('stepIndicator').style.display = 'flex';
-            document.getElementById('fileInput').value = '';
-            document.getElementById('fileInfo').classList.remove('show');
             document.getElementById('employeeId').value = '';
             document.getElementById('employeePin').value = '';
-            
-            // Reset steps
-            updateStep(1, 'active');
-            document.getElementById('step2').className = 'step-number';
-            document.getElementById('step3').className = 'step-number';
-            document.querySelectorAll('.step-text').forEach((text, i) => {
-                text.classList.remove('active');
-                if (i === 0) text.classList.add('active');
-            });
         }
 
         function showMessage(elementId, message, type) {
